@@ -46,7 +46,6 @@ export default function Home() {
   const [disableBoundaryCheck, setDisableBoundaryCheck] = useState(false);
   const [zoomSize, setZoomSize] = useState(60);
   const [zoomFactor, setZoomFactor] = useState(4);
-  const [exportFormat, setExportFormat] = useState('csv'); // 'csv', 'json', or 'excel'
   
   // Refs
   const stageRef = useRef(null);
@@ -531,73 +530,6 @@ export default function Home() {
     console.log('Measurement recorded:', measurement);
   };
   
-  // Convert measurements to CSV format
-  const convertToCSV = (data) => {
-    if (data.length === 0) return '';
-    
-    // Get headers from the first object
-    const headers = Object.keys(data[0]);
-    const csvRows = [
-      headers.join(','), // Header row
-      ...data.map(row => 
-        headers.map(field => {
-          // Handle values with commas by wrapping in quotes
-          const value = row[field] !== undefined ? row[field] : '';
-          return typeof value === 'string' && value.includes(',') 
-            ? `"${value}"` 
-            : value;
-        }).join(',')
-      )
-    ];
-    
-    return csvRows.join('\n');
-  };
-  
-  // Convert measurements to JSON format
-  const convertToJSON = (data) => {
-    return JSON.stringify(data, null, 2);
-  };
-  
-  // Handle table download
-  const handleDownloadTable = () => {
-    if (measurements.length === 0) {
-      alert('No measurements to export. Record some measurements first.');
-      return;
-    }
-    
-    let content, filename, mimeType;
-    
-    if (exportFormat === 'csv') {
-      content = convertToCSV(measurements);
-      filename = 'solar_measurements.csv';
-      mimeType = 'text/csv';
-    } else if (exportFormat === 'json') {
-      content = convertToJSON(measurements);
-      filename = 'solar_measurements.json';
-      mimeType = 'application/json';
-    } else {
-      // Default to CSV if format is not recognized
-      content = convertToCSV(measurements);
-      filename = 'solar_measurements.csv';
-      mimeType = 'text/csv';
-    }
-    
-    // Create a blob and download link
-    const blob = new Blob([content], { type: mimeType });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    
-    // Clean up
-    setTimeout(() => {
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-    }, 100);
-  };
-  
   return (
     <div className="flex h-screen bg-gray-100">
       <Head>
@@ -757,37 +689,6 @@ export default function Home() {
                 
                 <hr className="my-4" />
                 
-                {/* Download controls */}
-                <div className="mt-6 border-t pt-4">
-                  <h3 className="text-lg font-semibold mb-2">Export Measurements</h3>
-                  
-                  <div className="mb-3">
-                    <label className="block text-sm font-medium text-gray-700">Export Format:</label>
-                    <select
-                      className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                      value={exportFormat}
-                      onChange={(e) => setExportFormat(e.target.value)}
-                    >
-                      <option value="csv">CSV</option>
-                      <option value="json">JSON</option>
-                    </select>
-                  </div>
-                  
-                  <button
-                    className="w-full bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
-                    onClick={handleDownloadTable}
-                    disabled={measurements.length === 0}
-                  >
-                    Download Measurements Table
-                  </button>
-                  
-                  <p className="text-xs text-gray-500 mt-2">
-                    {measurements.length === 0 
-                      ? "Record some measurements first before downloading." 
-                      : `${measurements.length} measurement(s) will be exported.`}
-                  </p>
-                </div>
-                
                 <MeasurementsPanel
                   measurements={measurements}
                   setMeasurements={setMeasurements}
@@ -813,3 +714,4 @@ export default function Home() {
       </div>
     </div>
   );
+}
