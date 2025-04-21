@@ -744,3 +744,72 @@ export default function Home() {
                         >
                           Record Measurement
                         </button>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="text-gray-500">
+                    {animationRunning
+                      ? "Pause the animation to make measurements."
+                      : "Click on the image to measure solar features."}
+                  </div>
+                )}
+                
+                <hr className="my-4" />
+                
+                {/* Download controls */}
+                <div className="mt-6 border-t pt-4">
+                  <h3 className="text-lg font-semibold mb-2">Export Measurements</h3>
+                  
+                  <div className="mb-3">
+                    <label className="block text-sm font-medium text-gray-700">Export Format:</label>
+                    <select
+                      className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                      value={exportFormat}
+                      onChange={(e) => setExportFormat(e.target.value)}
+                    >
+                      <option value="csv">CSV</option>
+                      <option value="json">JSON</option>
+                    </select>
+                  </div>
+                  
+                  <button
+                    className="w-full bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+                    onClick={handleDownloadTable}
+                    disabled={measurements.length === 0}
+                  >
+                    Download Measurements Table
+                  </button>
+                  
+                  <p className="text-xs text-gray-500 mt-2">
+                    {measurements.length === 0 
+                      ? "Record some measurements first before downloading." 
+                      : `${measurements.length} measurement(s) will be exported.`}
+                  </p>
+                </div>
+                
+                <MeasurementsPanel
+                  measurements={measurements}
+                  setMeasurements={setMeasurements}
+                />
+              </div>
+            ) : (
+              <ImageInfoPanel
+                originalDimensions={originalDimensions}
+                displayDimensions={displayDimensions}
+                obsTime={obsTime}
+                sunParams={sunParams}
+                adjustedSunParams={adjustedSunParams}
+                imageScale={imageScale}
+                centerXOffset={centerXOffset}
+                centerYOffset={centerYOffset}
+                radiusCorrection={radiusCorrection}
+                forceFitsData={forceFitsData}
+                currentFilename={sortedFilenames[currentImageIndex] || ''}
+              />
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
